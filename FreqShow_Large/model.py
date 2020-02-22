@@ -51,17 +51,18 @@ class FreqShowModel(object):
 		# Initialize RTL-SDR library.
 		self.sdr = RtlSdr()
                 self.set_freq_correction(0)  # (58ppm for unenhanced)can run test to determine this value, via regular antenna, not IF frequency!
-		self.set_swap_iq(True)   
+                self.set_record_iq(False)
+		self.set_swap_iq(True)
                 self.set_sample_rate(.230)  # in MHz, must be within (.225001 <= sample_rate_mhz <= .300000) OR (.900001 <= sample_rate_mhz <= 3.200000)
                 self.set_zoom_fac(.05)   # equal to the frequency span you want to display on the screen in MHz
 		self.set_lo_offset(0.03) # Local Oscillator offset in MHz, slide the DC spike out of the window by this amount.
 		self.set_center_freq(70.451500)
  		self.set_gain('AUTO')
 		self.set_fft_ave(3)
-		self.set_tune_rate(.001) # in MHz   
+		self.set_tune_rate(.001) # in MHz
 		self.set_sig_strength(0.00)
 		self.set_kaiser_beta(8.6)
-		self.set_peak(True)   # Set true for peaks, set False for averaging. 	
+		self.set_peak(True)   # Set true for peaks, set False for averaging.
 		self.set_filter('nuttall') # set default windowing filter.
 
 
@@ -78,6 +79,11 @@ class FreqShowModel(object):
 	def set_swap_iq(self, swap_iq):
 		self.swap_iq = (swap_iq)
 
+        def get_record_iq(self):
+		return (self.record_iq)
+
+	def set_record_iq(self, record_iq):
+		self.record_iq = (record_iq)
 
         def get_peak(self):
                 return (self.peak)
@@ -117,16 +123,16 @@ class FreqShowModel(object):
 	def get_lo_freq(self):
 		"""Return center frequency of tuner in megahertz."""
 		return (self.sdr.get_center_freq()/(1000000.0))
-	
+
 #	def set_lo_freq(self, freq_mhz):
 #		"""Set tuner center frequency to provided megahertz value."""
-#		try:	
+#		try:
 #			self.sdr.set_center_freq(freq_mhz*(1000000.0))
 #			self._clear_intensity()
 #		except IOError:
 #			# Error setting value, ignore it for now but in the future consider
 #			# adding an error message dialog.
-#			pass	
+#			pass
 
 	def get_sample_rate(self):
 		"""Return sample rate of tuner in megahertz."""
@@ -142,7 +148,7 @@ class FreqShowModel(object):
 				# adding an error message dialog.
 				pass
 		else:
-			self.sample_rate = self.get_sample_rate()			
+			self.sample_rate = self.get_sample_rate()
 
 	def get_gain(self):
 		"""Return gain of tuner.  Can be either the string 'AUTO' or a numeric
@@ -181,7 +187,7 @@ class FreqShowModel(object):
 			return '{0:0.0f}'.format(self.min_intensity)
 
 	def set_min_intensity(self, intensity):
-		"""Set Y axis minimum intensity in decibels (i.e. dB value at bottom of 
+		"""Set Y axis minimum intensity in decibels (i.e. dB value at bottom of
 		spectrograms).  Can also pass 'AUTO' to enable auto scaling of value.
 		"""
 		if intensity == 'AUTO':
@@ -201,7 +207,7 @@ class FreqShowModel(object):
 			return '{0:0.0f}'.format(self.max_intensity)
 
 	def set_max_intensity(self, intensity):
-		"""Set Y axis maximum intensity in decibels (i.e. dB value at top of 
+		"""Set Y axis maximum intensity in decibels (i.e. dB value at top of
 		spectrograms).  Can also pass 'AUTO' to enable auto scaling of value.
 		"""
 		if intensity == 'AUTO':
@@ -252,7 +258,7 @@ class FreqShowModel(object):
 		return self.filter
 
 
-	def set_filter(self, filter): 
+	def set_filter(self, filter):
 		self.filter = filter
 
 
@@ -269,7 +275,7 @@ class FreqShowModel(object):
                         zoom = int(self.width*((self.sdr.sample_rate/1000000)/self.zoom_fac))
                 else:
                         zoom = self.width
-                        self.zoom_fac = self.get_sample_rate()		
+                        self.zoom_fac = self.get_sample_rate()
 		freq_step = self.sdr.sample_rate/(zoom+2)
 		return freq_step
 
@@ -281,8 +287,8 @@ class FreqShowModel(object):
 		"""
 		# Get width number of raw samples so the number of frequency bins is
 		# the same as the display width.  Add two because there will be mean/DC
-		# values in the results which are ignored. Increase by 1/self.zoom_fac if needed		
-		
+		# values in the results which are ignored. Increase by 1/self.zoom_fac if needed
+
 
 		if self.zoom_fac < (self.sdr.sample_rate/1000000):
 			zoom = int(self.width*((self.sdr.sample_rate/1000000)/self.zoom_fac))
@@ -290,7 +296,7 @@ class FreqShowModel(object):
 			zoom = self.width
 			self.zoom_fac = self.get_sample_rate()
 
-		if zoom < freqshow.SDR_SAMPLE_SIZE:		
+		if zoom < freqshow.SDR_SAMPLE_SIZE:
 			freqbins = self.sdr.read_samples(freqshow.SDR_SAMPLE_SIZE)[0:zoom+2]
 		else:
 			zoom = self.width
@@ -299,13 +305,13 @@ class FreqShowModel(object):
 
 
 		# Apply a window function to the sample to remove power in sample sidebands before the fft.
-	
+
 		if self.filter == 'kaiser':
 			window = signal.kaiser(freqshow.SDR_SAMPLE_SIZE, self.kaiser_beta, False,)[0:zoom+2]  # for every bin there is a window the same exact size as the read samples.
 		elif self.filter == 'boxcar':
 			window = signal.boxcar(freqshow.SDR_SAMPLE_SIZE, False,)[0:zoom+2]
                 elif self.filter == 'hann':
-                        window = signal.hann(freqshow.SDR_SAMPLE_SIZE, False,)[0:zoom+2]	
+                        window = signal.hann(freqshow.SDR_SAMPLE_SIZE, False,)[0:zoom+2]
                 elif self.filter == 'hamming':
                         window = signal.hamming(freqshow.SDR_SAMPLE_SIZE, False,)[0:zoom+2]
                 elif self.filter == 'blackman':
@@ -323,11 +329,11 @@ class FreqShowModel(object):
 
 		samples = freqbins * window
 
-		# Run an FFT and take the absolute value to get frequency magnitudes.		
+		# Run an FFT and take the absolute value to get frequency magnitudes.
 		freqs = np.absolute(fft(samples))
 
 		# Ignore the mean/DC values at the ends.
-		freqs = freqs[1:-1] 
+		freqs = freqs[1:-1]
 
                 # Reverse the order of the freqs array if swaping I and Q
 		if self.swap_iq == True:

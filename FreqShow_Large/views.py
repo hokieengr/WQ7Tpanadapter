@@ -99,10 +99,10 @@ class MessageDialog(ViewBase):
 		self.accept = accept
 		self.cancel = cancel
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 5)
-		self.buttons.add(3, 4, 'OK', click=self.accept_click, 
+		self.buttons.add(3, 4, 'OK', click=self.accept_click,
 			bg_color=freqshow.ACCEPT_BG)
 		if cancel is not None:
-			self.buttons.add(0, 4, 'CANCEL', click=self.cancel_click, 
+			self.buttons.add(0, 4, 'CANCEL', click=self.cancel_click,
 				bg_color=freqshow.CANCEL_BG)
 		self.label = ui.render_text(text, size=freqshow.NUM_FONT,
 			fg=freqshow.BUTTON_FG, bg=freqshow.MAIN_BG)
@@ -165,12 +165,12 @@ class NumberDialog(ViewBase):
 		self.buttons.add(3, 3, 'CANCEL', click=self.cancel_click,
 			bg_color=freqshow.CANCEL_BG)
 		self.buttons.add(3, 4, 'ACCEPT', click=self.accept_click,
-			bg_color=freqshow.ACCEPT_BG) 
+			bg_color=freqshow.ACCEPT_BG)
 		if has_auto:
 			self.buttons.add(3, 2, 'AUTO', click=self.auto_click)
 		# Build label text for faster rendering.
 		self.input_rect = (0, 0, self.model.width, self.buttons.row_size)
-		self.label = ui.render_text(label_text, size=freqshow.MAIN_FONT, 
+		self.label = ui.render_text(label_text, size=freqshow.MAIN_FONT,
 			fg=freqshow.INPUT_FG, bg=freqshow.INPUT_BG)
 		self.label_pos = ui.align(self.label.get_rect(), self.input_rect,
 			horizontal=ui.ALIGN_LEFT, hpad=10)
@@ -425,15 +425,17 @@ class SettingsList(ViewBase):
 		tune_rate_text	= 'Tune Rate: {0:0.3f} MHz'.format(model.get_tune_rate())
 		lo_offset_text = 'LO Offset: {0:0.2f} MHz'.format(model.get_lo_offset())
 		zoom_fac_text = 'Zoom: {0:0.3f} MHz'.format(model.get_zoom_fac())
-		freq_correction_text = 'Freq Corr: {0} ppm'.format(model.get_freq_correction()) 
+		freq_correction_text = 'Freq Corr: {0} ppm'.format(model.get_freq_correction())
 		filter_text = '{0}'.format(model.get_filter())
 		kaiser_beta_text = 'beta:{0:0.1f}'.format(model.get_kaiser_beta())
 		swap_iq_text = 'Swap IQ: {0}'.format(model.get_swap_iq())
                	peak_text = 'Peak: {0}'.format(model.get_peak())
+		record_iq_text = 'Record IQ: {0}'.format(model.get_record_iq())
 
 		# Create buttons.
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 6)
-		self.buttons.add(0, 0, centerfreq_text, colspan=2, click=self.centerfreq_click)
+		self.buttons.add(0, 0, centerfreq_text, colspan=1, click=self.centerfreq_click)
+		self.buttons.add(1, 0, record_iq_text, colspan=1, click=self.record_iq_click)
 		self.buttons.add(0, 1, samplerate_text, colspan=2, click=self.sample_click)
 		self.buttons.add(0, 2, fft_ave_text,    colspan=1, click=self.fft_ave_click)
 		self.buttons.add(2, 1, tune_rate_text,  colspan=2, click=self.tune_rate_click)
@@ -443,7 +445,7 @@ class SettingsList(ViewBase):
 		self.buttons.add(0, 4, min_text,        colspan=1, click=self.min_click)
 		self.buttons.add(1, 4, max_text,        colspan=1, click=self.max_click)
 		self.buttons.add(3, 5, 'BACK', 		colspan=1, click=self.controller.change_to_main)
-		self.buttons.add(1, 2, lo_offset_text, colspan=2, click=self.lo_offset_click)		
+		self.buttons.add(1, 2, lo_offset_text, colspan=2, click=self.lo_offset_click)
 		self.buttons.add(2, 3, filter_text, colspan=1, click=self.filter_click)
 		if self.model.get_filter() == 'kaiser':
 			self.buttons.add(3, 3, kaiser_beta_text, colspan=1, click=self.kaiser_beta_click)
@@ -485,10 +487,10 @@ class SettingsList(ViewBase):
 		self.controller.number_dialog('FFT AVE:', 'X',
 			initial=self.model.get_fft_ave(),
 			accept=self.fft_ave_accept)
-			
+
 	def fft_ave_accept(self, value):
 		self.model.set_fft_ave(value)
-		self.controller.change_to_settings()		
+		self.controller.change_to_settings()
 
 	def tune_rate_click(self, button):
 		self.controller.number_dialog('TUNE RATE:', 'MHz',
@@ -513,7 +515,7 @@ class SettingsList(ViewBase):
 		self.controller.number_dialog('ZOOM in:', 'MHz',
 			initial='{0:0.3f}'.format(self.model.get_zoom_fac()),
 			accept=self.zoom_fac_accept)
-	
+
 	def zoom_fac_accept(self, value):
 		self.model.set_zoom_fac(value)
 		self.controller.change_to_settings()
@@ -527,11 +529,11 @@ class SettingsList(ViewBase):
 	def freq_correction_accept(self, value):
 		self.model.set_freq_correction(int(value))
 		self.controller.change_to_settings()
-				
-		
+
+
 	def gain_click(self, button):
 		self.controller.number_dialog('GAIN:', 'dB',
-			initial=self.model.get_gain(), accept=self.gain_accept, 
+			initial=self.model.get_gain(), accept=self.gain_accept,
 			has_auto=True)
 
 	def gain_accept(self, value):
@@ -541,17 +543,17 @@ class SettingsList(ViewBase):
 
 	def min_click(self, button):
 		self.controller.number_dialog('MIN:', 'dB',
-			initial=self.model.get_min_string(), accept=self.min_accept, 
+			initial=self.model.get_min_string(), accept=self.min_accept,
 			has_auto=True, allow_negative=True)
 
 	def min_accept(self, value):
-		self.model.set_min_intensity(value)  
+		self.model.set_min_intensity(value)
 		self.controller.waterfall.clear_waterfall()
 		self.controller.change_to_settings()
 
 	def max_click(self, button):
 		self.controller.number_dialog('MAX:', 'dB',
-			initial=self.model.get_max_string(), accept=self.max_accept, 
+			initial=self.model.get_max_string(), accept=self.max_accept,
 			has_auto=True, allow_negative=True)
 
 	def max_accept(self, value):
@@ -587,9 +589,18 @@ class SettingsList(ViewBase):
 		self.controller.boolean_dialog('Swap I&Q', ' ',
 			initial=self.model.get_swap_iq(),
 			accept=self.swap_iq_accept)
-      
+
 	def swap_iq_accept(self, value):
 		self.model.set_swap_iq(value)
+		self.controller.change_to_settings()
+
+        def record_iq_click(self, button):
+		self.controller.boolean_dialog('Record I&Q', ' ',
+			initial=self.model.get_record_iq(),
+			accept=self.record_iq_accept)
+
+	def record_iq_accept(self, value):
+		self.model.set_record_iq(value)
 		self.controller.change_to_settings()
 
         def peak_click(self, button):
@@ -662,11 +673,11 @@ class SpectrogramBase(ViewBase):
 		position.
 		"""
 		y = self.model.height - self.buttons.row_size + padding
-		pygame.draw.lines(screen, freqshow.SYMBOL_FG, False, 
+		pygame.draw.lines(screen, freqshow.SYMBOL_FG, False,
 			[(x, y), (x-size, y+size), (x+size, y+size), (x, y), (x, y+2*size)])
 
 	def render_inv_hash(self, screen, x, size=5, padding=2):
-		"""Draw a hash mark (triangle) on the top row at the specified x	
+		"""Draw a hash mark (triangle) on the top row at the specified x
 		position.
 		"""
 		y = self.buttons.row_size + padding
@@ -685,7 +696,7 @@ class SpectrogramBase(ViewBase):
 			# Draw hash marks.
 			self.render_hash(screen, 0)
 			self.render_hash(screen, self.model.width/2)
-			self.render_hash(screen, self.model.width-1)	
+			self.render_hash(screen, self.model.width-1)
 
 			# Draw frequencies in bottom row.
 			bottom_row  = (0, self.model.height-self.buttons.row_size,
@@ -694,10 +705,10 @@ class SpectrogramBase(ViewBase):
 #			freq        = float(self.model.get_lo_freq()) - float(self.model.get_lo_offset())
 			freq 	    = self.model.get_center_freq()
 			bandwidth   = self.model.get_zoom_fac()
-			sig         = (self.model.get_sig_strength()/6)		
+			sig         = (self.model.get_sig_strength()/6)
 			offset      = self.model.get_lo_offset()
 			beta        = self.model.get_kaiser_beta()
-		
+
 			# Render minimum frequency on left.
 			label = ui.render_text('- {0:0.4f} Mhz'.format(bandwidth/2.0),
 				size=freqshow.MAIN_FONT, bg=freqshow.MAIN_BG)
@@ -744,7 +755,7 @@ class SpectrogramBase(ViewBase):
 			label = ui.render_text('scale = {0:0.1f} dB' .format((self.model.max_intensity-self.model.min_intensity)/10),
 				size=freqshow.MAIN_FONT, bg=freqshow.GRID_BG)
 			screen.blit(label, ui.align(label.get_rect(), spect_rect,
-				horizontal=ui.ALIGN_RIGHT, vertical=ui.ALIGN_TOP)) 
+				horizontal=ui.ALIGN_RIGHT, vertical=ui.ALIGN_TOP))
 
 			# Render Signal plus to Noise of Ceneter Frequency in center top.
 #			label = ui.render_text('S units = {0:0.1f}' .format(sig),
@@ -819,11 +830,11 @@ class WaterfallSpectrogram(SpectrogramBase):
 			self.waterfall.set_at((i, wheight-1), self.color_func(power))
 		self.waterfall.unlock()
 		screen.blit(self.waterfall, (0, 0), area=(0, offset, width, height))
-		
+
 class InstantSpectrogram(SpectrogramBase):
 	"""Instantaneous point in time line plot of the spectrogram."""
 
-	def __init__(self, model, controller):	
+	def __init__(self, model, controller):
                 super(InstantSpectrogram, self).__init__(model, controller)
                 self.checkfirst = self.model.fft_ave +1
                 self.freqsfirst = self.model.get_data()
@@ -834,18 +845,18 @@ class InstantSpectrogram(SpectrogramBase):
 	def render_spectrogram(self, screen):
 
 		# Grab fft data and plot it.
-		freqslast = self.model.get_data()		
+		freqslast = self.model.get_data()
 
-		if (self.freqsfirst.size != freqslast.size) or (self.checkfirst != (self.model.fft_ave+1)): 
+		if (self.freqsfirst.size != freqslast.size) or (self.checkfirst != (self.model.fft_ave+1)):
                         self.checkfirst = self.model.fft_ave +1
 	                self.freqsfirst = self.model.get_data()
                 	self.freqsinit = np.tile(self.freqsfirst,(self.checkfirst,1))
                 	self.freqgrabs = self.freqsinit.copy()
 
- 
+
 
 		for i in range(1,self.model.fft_ave+1):
-			np.copyto(self.freqgrabs[i-1],self.freqgrabs[i])		
+			np.copyto(self.freqgrabs[i-1],self.freqgrabs[i])
 		np.copyto(self.freqgrabs[self.model.fft_ave],freqslast)
 
 
@@ -862,7 +873,7 @@ class InstantSpectrogram(SpectrogramBase):
 		# Render frequency graph.
 		screen.fill(freqshow.GRID_BG)
 		# Draw grid lines for spectrum background
-		pygame.draw.line(screen, freqshow.GRID_LINE, (0, height/2), (width, height/2)) 
+		pygame.draw.line(screen, freqshow.GRID_LINE, (0, height/2), (width, height/2))
 		pygame.draw.line(screen, freqshow.CENTER_LINE, (width/2, 0), (width/2, height))
 		pygame.draw.line(screen, freqshow.GRID_LINE, (width/10, 0), (width/10, height))
 		pygame.draw.line(screen, freqshow.GRID_LINE, (2*width/10, 0), (2*width/10, height))
@@ -888,7 +899,7 @@ class InstantSpectrogram(SpectrogramBase):
 		pygame.draw.line(screen, freqshow.CENTER_LINE, (0, (abs(self.model.max_intensity)/(self.model.max_intensity-self.model.min_intensity)*height)), (width-1, (abs(self.model.max_intensity)/(self.model.max_intensity-self.model.min_intensity)*height)))
 
 		# Draw line segments to join each FFT result bin.
-		ylast = freqs[0]		
+		ylast = freqs[0]
 #		freqs1 = freqs/height
 
 		for i in range(1, width):
@@ -899,5 +910,5 @@ class InstantSpectrogram(SpectrogramBase):
 			pygame.draw.line(screen, freqshow.INPUT_FG, (i-1, ylast), (i, y))
 			pygame.draw.line(screen, freqshow.LINE_SHADOW, (i,y+3),(i,height))
 	                ylast = y
-	                       		
+
 		# End of plot
