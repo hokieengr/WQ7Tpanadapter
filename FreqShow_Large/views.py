@@ -434,12 +434,12 @@ class SettingsList(ViewBase):
 
 		# Create buttons.
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 6)
-		self.buttons.add(0, 0, centerfreq_text, colspan=1, click=self.centerfreq_click)
-		self.buttons.add(1, 0, record_iq_text, colspan=1, click=self.record_iq_click)
+		self.buttons.add(0, 0, centerfreq_text, colspan=2, click=self.centerfreq_click)
+		self.buttons.add(2, 0, record_iq_text, colspan=1, click=self.record_iq_click)
 		self.buttons.add(0, 1, samplerate_text, colspan=2, click=self.sample_click)
 		self.buttons.add(0, 2, fft_ave_text,    colspan=1, click=self.fft_ave_click)
 		self.buttons.add(2, 1, tune_rate_text,  colspan=2, click=self.tune_rate_click)
-		self.buttons.add(2, 0, zoom_fac_text,   colspan=2, click=self.zoom_fac_click)
+		self.buttons.add(3, 0, zoom_fac_text,   colspan=1, click=self.zoom_fac_click)
 		self.buttons.add(0, 3, freq_correction_text, colspan=2, click=self.freq_correction_click)
 		self.buttons.add(2, 4, gain_text,       colspan=1, click=self.gain_click)
 		self.buttons.add(0, 4, min_text,        colspan=1, click=self.min_click)
