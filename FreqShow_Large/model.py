@@ -296,12 +296,19 @@ class FreqShowModel(object):
 			zoom = self.width
 			self.zoom_fac = self.get_sample_rate()
 
+                # Read the full array in case we want to write it to a file
+		rawsamples = self.sdr.read_samples(freqshow.SDR_SAMPLE_SIZE)
+
+                # Write the data if requested
+		if self.record_iq == True:
+                    # do something
+
 		if zoom < freqshow.SDR_SAMPLE_SIZE:
-			freqbins = self.sdr.read_samples(freqshow.SDR_SAMPLE_SIZE)[0:zoom+2]
+			freqbins = rawsamples[0:zoom+2]
 		else:
 			zoom = self.width
 			self.zoom_fac = self.get_sample_rate()
-			freqbins = self.sdr.read_samples(freqshow.SDR_SAMPLE_SIZE)[0:zoom+2]
+			freqbins = rawsamples[0:zoom+2]
 
 
 		# Apply a window function to the sample to remove power in sample sidebands before the fft.
